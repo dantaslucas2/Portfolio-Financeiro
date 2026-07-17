@@ -1,4 +1,6 @@
-﻿namespace PortfolioFinanceiro;
+﻿using NUnit.Framework;
+
+namespace PortfolioFinanceiro;
 
 public class PerformanceTest
 {
