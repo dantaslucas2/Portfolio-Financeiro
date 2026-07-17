@@ -2,7 +2,7 @@
 
 namespace PortfolioFinanceiro.Services.Interfaces
 {
-    public interface IPortfolioValuator
+    interface IPortfolioValuator
     {
         Task<ValuedPortfolio?> ValueAsync(int portfolioId, CancellationToken ct = default);
     }
