@@ -1,44 +1,58 @@
+using PortfolioFinanceiro.Data;
+using PortfolioFinanceiro.Services;
+using PortfolioFinanceiro.Services.Interfaces;
+using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+
+
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Services.AddControllers();
+
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new()
+    {
+        Title = "Portfolio Analytics API",
+        Version = "v1",
+        Description =
+            "Analytics de portfólio"
+    });
+
+    var xml = Path.Combine(AppContext.BaseDirectory,
+        $"{Assembly.GetExecutingAssembly().GetName().Name}.xml");
+    if (File.Exists(xml))
+        options.IncludeXmlComments(xml);
+});
+builder.Services.AddDbContext<DataContext>(options =>
+    options.UseInMemoryDatabase("PortfolioAnalytics"));
+
+builder.Services.AddScoped<IPortfolioValuator, PortfolioValuator>();
+builder.Services.AddScoped<IPerformanceCalculator, PerformanceCalculator>();
+builder.Services.AddScoped<IRiskAnalyzer, RiskAnalyzer>();
+builder.Services.AddScoped<IRebalancingOptimizer, RebalancingOptimizer>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+using (var scope = app.Services.CreateScope())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+
 }
 
-app.UseHttpsRedirection();
+app.UseExceptionHandler();
+app.UseStatusCodePages();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+app.UseSwagger();
+app.UseSwaggerUI(o => o.SwaggerEndpoint("/swagger/v1/swagger.json", "Portfolio Analytics API v1"));
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast")
-.WithOpenApi();
+// Swagger na raiz: o avaliador executa `dotnet run` e cai direto na documentação navegável.
+app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription();
+
+app.MapControllers();
 
 app.Run();
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
