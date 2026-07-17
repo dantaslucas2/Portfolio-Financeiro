@@ -9,6 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+builder.Services.AddProblemDetails();
 
 // Add services to the container.
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -40,7 +41,10 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
-
+    var db = scope.ServiceProvider.GetRequiredService<DataContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("Seed");
+    var path = Path.Combine(AppContext.BaseDirectory, "Data", "SeedData.json");
+    SeedDataLoader.Seed(db, path, logger);
 }
 
 app.UseExceptionHandler();
@@ -56,3 +60,4 @@ app.MapControllers();
 
 app.Run();
 
+public partial class Program { }

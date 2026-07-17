@@ -1,6 +1,6 @@
 ﻿namespace PortfolioFinanceiro.Models
 {
-    public class ValuedPortfolio
+    internal sealed record ValuedPortfolio
     {
         public required Portfolio Portfolio { get; init; }
         public required MarketSnapshot Market { get; init; }
@@ -15,7 +15,7 @@
 
     }
 
-    public class ValuedPosition
+    internal sealed record ValuedPosition
     {
         public required Position Position { get; init; }
         public required Asset Asset { get; init; }
