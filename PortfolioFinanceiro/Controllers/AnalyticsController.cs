@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NUnit.Framework;
 using PortfolioFinanceiro.Models.DTOs;
 using PortfolioFinanceiro.Services.Interfaces;
 
@@ -44,15 +43,38 @@ namespace PortfolioFinanceiro.Controllers
         }
 
         [HttpGet("{id:int}/risk-analysis")]
-        public async Task<ActionResult<RiskAnalysisResponse>> GetRiskAnalysis()
+        public async Task<ActionResult<RiskAnalysisResponse>> GetRiskAnalysis(int id, CancellationToken ct)
         {
-            throw new System.NotImplementedException();
+            if (id <= 0)
+                return InvalidId(id);
+
+            var result = await _risk.AnalyzeAsync(id, ct);
+            if (result is null)
+                return PortfolioNotFound(id);
+
+            _logger.LogInformation(
+                "Risco analisado para portfólio {PortfolioId}: nível {OverallRisk}, maior posição {Symbol} com {Percentage}%, Sharpe {Sharpe}",
+                id, result.OverallRisk, result.ConcentrationRisk.LargestPosition.Symbol,
+                result.ConcentrationRisk.LargestPosition.Percentage, result.SharpeRatio);
+
+            return Ok(result);
         }
 
         [HttpGet("{id:int}/rebalancing")]
-        public async Task<ActionResult<RebalancingResponse>> GetRebalancing()
+        public async Task<ActionResult<RebalancingResponse>> GetRebalancing(int id, CancellationToken ct)
         {
-            throw new System.NotImplementedException();
+            if (id <= 0)
+                return InvalidId(id);
+
+            var result = await _rebalancing.OptimizeAsync(id, ct);
+            if (result is null)
+                return PortfolioNotFound(id);
+
+            _logger.LogInformation(
+                "Rebalanceamento avaliado para portfólio {PortfolioId}: necessário={NeedsRebalancing}, {TradeCount} trades, custo total {Cost:C}",
+                id, result.NeedsRebalancing, result.SuggestedTrades.Count, result.TotalTransactionCost);
+
+            return Ok(result);
         }
         private ActionResult InvalidId(int id)
         {
