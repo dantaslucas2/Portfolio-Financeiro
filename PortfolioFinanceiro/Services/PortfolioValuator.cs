@@ -85,7 +85,6 @@ namespace PortfolioFinanceiro.Services
                     $"A volatilidade foi calculada sobre {FinancialMath.ToPercent(coverage)}% do valor do portfólio.");
             }
 
-            // Premissa P3: divergência entre o capital declarado e o efetivamente alocado.
             if (Math.Abs(portfolio.TotalInvestment - invested) > 0.01m)
             {
                 warnings.Add(
@@ -94,7 +93,8 @@ namespace PortfolioFinanceiro.Services
                     "'totalReturnOnInvestment' expõe a métrica sobre o valor declarado.");
             }
 
-            // Premissa P2: o período é medido contra a data de referência do seed, nunca contra o relógio.
+            // O período usado na anualização é sempre contra a data de referência do seed
+            // (market.AsOfDate), nunca contra o relógio
             var createdOn = DateOnly.FromDateTime(portfolio.CreatedAt);
             var periodInDays = market.AsOfDate.DayNumber - createdOn.DayNumber;
 

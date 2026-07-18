@@ -6,6 +6,7 @@
 
         private const int CalendarDaysPerYear = 365;
 
+        // Convenção do arquivo inteiro: um resultado indefinido  vira null
         public static decimal? SimpleReturn(decimal initialValue, decimal finalValue) =>
     initialValue > 0 ? (finalValue - initialValue) / initialValue : null;
 
@@ -18,6 +19,7 @@
             if (growth <= 0d)
                 return null;
 
+            // decimal não tem Math.Pow; a conversão para double é só para essa potenciação
             var annualized = Math.Pow(growth, (double)CalendarDaysPerYear / periodInDays) - 1d;
             return double.IsFinite(annualized) ? (decimal)annualized : null;
         }

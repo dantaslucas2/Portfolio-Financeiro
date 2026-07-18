@@ -151,6 +151,8 @@ namespace PortfolioFinanceiro.Services
                     $"(ideal < {FinancialMath.ToPercent(MediumPositionThreshold)}%).");
             }
 
+            // Count >= 2 evita a recomendação óbvia e inútil num portfólio de um único ativo,
+            // onde o HHI é sempre 1 e "1 posição efetiva" não é uma informação acionável.
             var effective = FinancialMath.HerfindahlIndex(valued.Positions.Select(p => p.Weight));
             if (effective > 0 && 1m / effective < 5m && valued.Positions.Count >= 2)
             {

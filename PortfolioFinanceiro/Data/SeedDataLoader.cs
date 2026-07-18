@@ -78,7 +78,9 @@ namespace PortfolioFinanceiro.Data
         private static List<Portfolio> LoadPortfolios(SeedFile raw) =>
             raw.Portfolios.Select((p, index) => new Portfolio
             {
-                Id = index + 1, // premissa P1
+                // O seed não traz um id de portfólio, foi inferido sequencialmente na ordem
+                // em que aparecem no arquivo.
+                Id = index + 1,
                 Name = p.Name,
                 UserId = p.UserId,
                 TotalInvestment = p.TotalInvestment,
@@ -92,6 +94,7 @@ namespace PortfolioFinanceiro.Data
                     LastTransaction = pos.LastTransaction
                 }).ToList()
             }).ToList();
+
 
         private static MarketSnapshot BuildMarketSnapshot(SeedFile raw, List<Asset> assets)
         {

@@ -10,8 +10,8 @@ namespace PortfolioFinanceiro.Services
         private readonly ILogger<RebalancingOptimizer> _logger;
 
         private const decimal DeviationThreshold = 0.02m;
-        private const decimal MinimumTradeValue = 100m; //Minimal value for trade
-        private const decimal TransactionCostRate = 0.003m; // cost per transaction
+        private const decimal MinimumTradeValue = 100m;//Minimal value for trade
+        private const decimal TransactionCostRate = 0.003m;// cost per transaction
 
         public RebalancingOptimizer(IPortfolioValuator valuator, ILogger<RebalancingOptimizer> logger)
         {
